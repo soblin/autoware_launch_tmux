@@ -1,0 +1,114 @@
+session_name: planning_simulator
+
+# can be specified from CLI
+environment:
+  # Essential parameters
+  workspace: ${HOME}
+  map_path: ${HOME}
+  vehicle_model: lexus
+  sensor_model: aip_xx1
+  # vehicle_id: TODO
+
+  # Optional parameters
+  rviz: "true"
+  rviz_config: autoware.rviz
+  lanelet2_map_file: lanelet2_map.osm
+  pointcloud_map_file: pointcloud_map.pcd
+  cruise_planner_type: obstacle_stop_planner
+
+  # Optional parameters for scenario simulation
+  initial_engage_state: "true"
+  perception_enable_detection_failure: "true"
+  perception_enable_object_recognition: "true"
+  perception_enable_traffic_light: "false"
+  sensing_visible_range: "300.0"
+  scenario_simulation: "false"
+
+  # Optional parameters for vcu emulation
+  vehicle_simulation: "true"
+
+  # api
+  run_mode: planning_simulation
+
+options:
+  default-command: /bin/bash
+
+shell_command_before:
+  - export workspace=${workspace}
+  - export map_path=${map_path}
+  - export vehicle_model=${vehicle_model}
+  - export sensor_model=${sensor_model}
+  - export rviz=${rviz}
+  - export rviz_config=${rviz_config}
+  - export lanelet2_map_file=${lanelet2_map_file}
+  - export pointcloud_map_file=${pointcloud_map_file}
+  - export cruise_planner_type=${cruise_planner_type}
+  - export initial_engage_state=${initial_engage_state}
+  - export perception_enable_detection_failure=${perception_enable_detection_failure}
+  - export perception_enable_object_recognition=${perception_enable_object_recognition}
+  - export perception_enable_traffic_light=${perception_enable_traffic_light}
+  - export sensing_visible_range=${sensing_visible_range}
+  - export scenario_simulation=${scenario_simulation}
+  - export vehicle_simulation=${vehicle_simulation}
+  - export run_model=${run_mode}
+  - export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+  - export ROS_LOCALHOST_ONLY=1
+  - export RCUTILS_COLORIZED_OUTPUT=1
+  - source "${workspace}/install/setup.bash"
+
+windows:
+  - window_name: map
+    layout: tiled
+    panes:
+      - shell_command:
+        - ros2 launch autoware_launch_tmux map.launch.xml
+            map_path:=${map_path}
+            lanelet2_map_file:=${lanelet2_map_file}
+            pointcloud_map_file:=${pointcloud_map_file}
+
+  - window_name: vehicle
+    layout: tiled
+    panes:
+      - shell_command:
+        - ros2 launch autoware_launch_tmux vehicle.launch.xml
+            vehicle_model:=${vehicle_model}
+            sensor_model:=${sensor_model}
+            vehicle_simulation:=${vehicle_simulation}
+
+  - window_name: control
+    layout: tiled
+    panes:
+      - shell_command:
+        - ros2 launch autoware_launch_tmux control.launch.xml
+            vehicle_model:=${vehicle_model}
+
+  - window_name: planning
+    layout: tiled
+    panes:
+      - shell_command:
+        - ros2 launch autoware_launch_tmux planning.launch.xml
+            vehicle_model:=${vehicle_model}
+            cruise_planner_type:=${cruise_planner_type}
+
+  - window_name: system/api
+    layout: tiled
+    panes:
+      - ros2 launch autoware_launch_tmux system.launch.xml
+          sensor_model:=${sensor_model}
+          run_mode:=${run_mode}
+      - ros2 launch autoware_launch_tmux api.launch.xml
+
+  - window_name: simulator/tools
+    layout: tiled
+    panes:
+      - ros2 launch autoware_launch_tmux simulator.launch.xml
+          vehicle_model:=${vehicle_model}
+          intial_engage_state:=${initial_engage_state}
+          perception_enable_detection_failure:=${perception_enable_detection_failure}
+          perception_enable_object_recognition:=${perception_enable_object_recognition}
+          perception_enable_traffic_light:=${perception_enable_traffic_light}
+          sensing_visible_range:=${sensing_visible_range}
+          scenario_simulation:=${scenario_simulation}
+      - ros2 launch autoware_launch_tmux tools.launch.xml
+          rviz:=${rviz}
+          rviz_config:=$(ros2 pkg prefix --share autoware_launch_tmux)/rviz/${rviz_config}

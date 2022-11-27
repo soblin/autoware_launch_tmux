@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <arg name="sensor_model" description="sensor model name"/>
+  <arg name="run_mode" description="online or planning_simulation"/>
+  <!-- System -->
+  <group>
+    <include file="$(find-pkg-share system_launch)/launch/system.launch.xml">
+      <arg name="run_mode" value="$(var run_mode)"/>
+      <arg name="sensor_model" value="$(var sensor_model)"/>
+    </include>
+  </group>
+</launch>

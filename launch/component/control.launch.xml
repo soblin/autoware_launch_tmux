@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <arg name="vehicle_model" description="vehicle model name"/>
+  <include file="$(find-pkg-share global_parameter_loader)/launch/global_params.launch.py">
+    <arg name="vehicle_model" value="$(var vehicle_model)"/>
+  </include>
+  <!-- Control -->
+  <group>
+    <include file="$(find-pkg-share control_launch)/launch/control.launch.xml">
+      <!-- options for lateral_controller_mode: mpc_follower, pure_pursuit -->
+      <arg name="lateral_controller_mode" value="mpc_follower" />
+      <!-- options for longitudinal_controller_mode: pid -->
+      <arg name="longitudinal_controller_mode" value="pid" />
+      <!-- Options for external emergency stop module. Heartbeat topic is required if this is true. -->
+      <arg name="use_external_emergency_stop" value="false" />
+    </include>
+  </group>
+</launch>
